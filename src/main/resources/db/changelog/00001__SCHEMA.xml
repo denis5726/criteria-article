@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="1" author="denis5726">
+        <createTable tableName="order">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" primaryKeyName="order_pk"/>
+            </column>
+            <column name="status" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="store_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="finished_at" type="timestamptz"/>
+            <column name="created_at" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="product">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" primaryKeyName="product_pk"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="decimal">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="order_item">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" primaryKeyName="order_item_pk"/>
+            </column>
+            <column name="order_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="order_item_fk_order_id" referencedTableName="order"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="product_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="order_item_fk_product_id" referencedTableName="product"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="quantity" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="order_status_history">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" primaryKeyName="order_status_history_pk"/>
+            </column>
+            <column name="order_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="order_status_history_fk_order_id"
+                             referencedTableName="order"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="status" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="order_item" columnNames="order_id,product_id"
+                             constraintName="order_item_uq_order_id_product_id"/>
+    </changeSet>
+</databaseChangeLog>

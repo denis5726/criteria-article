@@ -1,0 +1,5 @@
+###
+GET http://localhost:8080/sentInStoreOrders?storeId=00000000-0000-0000-0000-000000000000
+
+###
+GET http://localhost:8080/storeStatistic?lowerBound=0&upperBound=1000000
