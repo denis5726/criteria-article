@@ -71,14 +71,20 @@ public class OrderRepositoryImpl implements OrderRepository {
         final var order = query.from(Order.class);
         final var items = order.join(Order_.ITEMS, JoinType.INNER);
         final var product = items.join(OrderItem_.PRODUCT, JoinType.INNER);
+        // Вынесем выражения подсчёта количества уникальных заказов со статусом в отдельный метод
+        // Выражения подсчёта количества с каждым статусом вынесем в отдельную переменную,
+        // так как они понадобятся в нескольких местах
         final var completedCount = countDistinctOrderByStatus(cb, order, Order.Status.COMPLETED);
         final var canceledCount = countDistinctOrderByStatus(cb, order, Order.Status.CANCELED);
         final var rejectedCount = countDistinctOrderByStatus(cb, order, Order.Status.REJECTED);
+        // Выражение подсчёта общей стоимости заказа тоже вынесем в отдельную переменную
         final var totalOrderPrice = cb.sum(
                 cb.<BigDecimal>prod(product.get(Product_.PRICE), items.get(OrderItem_.QUANTITY))
         );
 
         query.multiselect(
+                        // Для каждого столбца указываем явно тип и псевдоним, чтобы по нему потом достать значение
+                        // из кортежа
                         order.get(Order_.STORE_ID).as(UUID.class).alias("storeId"),
                         completedCount.as(Long.class).alias("completed"),
                         canceledCount.as(Long.class).alias("canceled"),
@@ -97,6 +103,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                                 )
                         )
                 )
+                // Сортируем магазины по убыванию количества завершённых заказов
                 .orderBy(cb.desc(cb.sum(cb.sum(completedCount, canceledCount), rejectedCount)));
 
         return entityManager.createQuery(query).getResultList().stream()
@@ -109,6 +116,7 @@ public class OrderRepositoryImpl implements OrderRepository {
             Root<Order> order,
             Order.Status status
     ) {
+        // Так записываем COUNT(DISTINCT CASE WHEN order.status = status THEN order.id END)
         return cb.countDistinct(
                 cb.selectCase()
                         .when(
@@ -120,6 +128,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     private OrderStoreStatisticProjection tupleToStatisticProjection(Tuple tuple) {
         return new OrderStoreStatisticProjection(
+                // Вот так можно извлекать значения из кортежа, но есть и другие способы,
+                // например, по номеру столбца
                 tuple.get("storeId", UUID.class),
                 tuple.get("completed", Long.class),
                 tuple.get("canceled", Long.class),
