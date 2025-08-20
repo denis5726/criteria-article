@@ -49,7 +49,6 @@ public class Order {
         SENT_TO_STORE,
         RECEIVED_IN_STORE,
         IN_PROCESSING,
-        PROCESSED,
         CANCELED,
         REJECTED,
         COMPLETED
