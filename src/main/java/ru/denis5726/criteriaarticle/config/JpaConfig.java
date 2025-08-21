@@ -15,7 +15,7 @@ import java.util.Optional;
 @Configuration
 @EnableJpaAuditing(dateTimeProviderRef = "currentZonedDateTimeProvider")
 public class JpaConfig implements FunctionContributor {
-    public static final String BOOL_OR = "bool_or";
+    public static final String BOOL_AND = "bool_and";
 
     // Бин для получения текущего времени типа ZonedDateTime
     // для сущностей с аудитом AuditingEntityListener.class и полем с аннотацией @CreatedDate
@@ -26,14 +26,14 @@ public class JpaConfig implements FunctionContributor {
 
     @Override
     public void contributeFunctions(FunctionContributions functionContributions) {
-        // Регистрация функции bool_or в реестре функций
+        // Регистрация функции bool_and в реестре функций
         functionContributions.getFunctionRegistry().register(
-                BOOL_OR,
+                BOOL_AND,
                 // StandardSQLFunction это самый простой способ описать SQL-функцию,
                 // нужно просто указать её название и возвращаемый тип,
                 // без более продвинутых вещей, например валидации аргументов
                 new StandardSQLFunction(
-                        BOOL_OR,
+                        BOOL_AND,
                         StandardBasicTypes.BOOLEAN
                 )
         );

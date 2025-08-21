@@ -3,3 +3,6 @@ GET http://localhost:8080/sentInStoreOrders?storeId=a3b24d3d-e9a9-4b85-8c49-1e5f
 
 ###
 GET http://localhost:8080/storeStatistic?lowerBound=0&upperBound=1000000
+
+###
+GET http://localhost:8080/ordersWithProductCategory?categoryName=Напитки
